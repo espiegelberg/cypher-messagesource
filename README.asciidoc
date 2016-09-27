@@ -1,0 +1,8 @@
+= CypherMessageSource =
+
+== Introduction ==
+
+Whether you realize it or not, the software you create has a global market. Perhaps more so than any other product in any other industry, code that may start as a small, individual effort has the potential to rapidly blossom into a product used around the world. While it is not always obvious that your application can or will have such wide usage, it is in your best interest to maximize the number of organizations and people you can reach. This means it is important to ensure your software is internationalized and localized.
+
+== Extending Neo4j ==
+
