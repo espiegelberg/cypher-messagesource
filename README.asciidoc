@@ -22,40 +22,73 @@ Register an instance of the CypherMessageSource within the ApplicationContext
 Create the desired message definitions within the database
 Localize and internationalize the application by updating hard coded strings of text
 
-
 == Clone, Build, Include ==
 When executed from within a unix shell, the following commands will clone the project source and build the jar:
 
+```
 git clone https://github.com/espiegelberg/cypher-messagesource
 cd cypher-messagesource
 mvn clean install
+```
 
 Next make use of your dependency management system, such as Maven or Gradle, to add the jar to the application.
 
 == Registering an Instance ==
 Modify the application to register an instance of the CypherMessageSource, such as through the use of the following JavaConfig:
 
-== Create The Desired Message Definitions ==
+```
+@Configuration
+public class ApplicationConfiguration {
+...
+	@Bean
+   	public MessageSource messageSource() {
+		MessageSource cypherMessageSource = new CypherMessageSource();
+        return cypherMessageSource;
+	}
+…
+}
+```
+
+== Create the Desired Message Definitions ==
 At the graph database level, each message definition is stored within a single MessageDefinition node. By taking advantage of the graph’s ability to store arbitrary key-value pairs, each MessageDefinition node contains a “code” property, indicating which message definition is being defined, and any number of locale code and locale specific message translation pairs. For example, to create a message definition to present users with an internationalized and localized welcome message, the following Cypher would be used:
 
+```
 create (n:MessageDefinition {code: 'welcome', en_US: 'Welcome', fr_FR: 'Bonjour', es_MX: 'Hola'})
+```
 
 The above Cypher statement can be adjusted and reused to formulate each desired message definition within the system. When the time arrives for your application to support a new language or locale, simply add an additional property to each MessageDefinition node containing the desired language code and message text. For example, to present users who have selected an Italian local with an appropriate welcome message, use the following Cypher to update the ‘welcome’ MessageDefinition:
 
+```
 match (n:MessageDefinition) where n.code = 'welcome' set n.it_IT = 'Ciao'
+```
 
 This process of message definition creation should be repeated for all desired localized and internationalized text within your system.
 
-== Localize and Internationalize The Application ==
+== Localize and Internationalize the Application ==
 Lastly, modify your application to remove instances of hard coded strings of text that should be internationalized and localized. For example, in a JSP-based application, replace the use of “Hello” with the use of Spring’s message tag library [6]:
 
+```
 ...
 <spring:message code="welcome" />
 …
+```
 
 As opposed to the previously hard coded value of “Hello”, the above line makes use of Spring’s internationalization and localization infrastructure, which employs the registered CypherMessageSource, to present the current user with the message definition appropriate for their selected language and locale. The result is that users in the US will be presented with “Hello”, users in France with “Bonjour”, and users in Mexico with “Hola”.
 
 Within the service layer, hard coded strings of text can be replaced by the use of an injected MessageSource and by supplying the desired message definition code and any desired locale. For example:
+
+```
+@Service
+public class FooService {
+…
+@Autowired
+private MessageSource messageSource;
+...
+Object arguments[] = new Object[] {};
+String name = messageSource.getMessage("welcome", arguments, Locale.US);
+…
+}
+```
 
 This dynamically generated string value can now be used within the service code just as the preceding hard coded name value was.
 
