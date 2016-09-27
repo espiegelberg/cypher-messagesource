@@ -4,5 +4,63 @@
 
 Whether you realize it or not, the software you create has a global market. Perhaps more so than any other product in any other industry, code that may start as a small, individual effort has the potential to rapidly blossom into a product used around the world. While it is not always obvious that your application can or will have such wide usage, it is in your best interest to maximize the number of organizations and people you can reach. This means it is important to ensure your software is internationalized and localized.
 
-== Extending Neo4j ==
+== Internationalization and Localization ==
+Internationalization is the process of developing products in such a way that they can be localized for languages and cultures easily. Localization is the process of adapting products to enable their usability in a particular cultural or linguistic market [1].
 
+What does that actually mean? It means when creating your software you should resist the temptation to use hard coded Strings of text and instead make use of a mechanism to dynamically populate that text with values meaningful to the current user’s language and locale. For example, rather than hard code the greeting of “Hello” in your system for all users, you could instead present a user based in the US with a greeting of “Hello”, a user in France with a greeting of “Bonjour”, and a user in Mexico with a greeting of “Hola”. By adopting internationalization and localization early within the development of your project, the time, effort, and resources required to cater to a global market can be quite low. 
+
+== Spring Support for Internalization and Localization ==
+As with numerous other aspects of Java software development, the Spring framework offers excellent support for internationalization and localization [2, 3] and two implementations of the MessageSource interface, a primary component to make use of in your code, are provided out-of-the-box. While these implementations work very well, they do rely on the message definitions (the “Hello”, “Bonjour”, or “Hola”) being defined in property files located on the filesystem. Because the use of property files is significantly less flexible than the use of a database, it is not uncommon for developers to create custom MessageSource implementations backed by JDBC. This approach has the advantages that message definitions can be updated at runtime, easily and quickly, with no additional application builds, deployments, or restarts required. With the message definitions stored in the database just as if they were any other application data (because they are), often message definition administrative functionality is added to the application, allowing the application to serve as a management console for convenient adding, updating, or deleting the internationalization and localization content of the system.
+
+== The CypherMessageSource ==
+The CypherMessageSource is a MessageSource implementation that uses the Cypher query language to load message definitions from a Cypher-compatible graph database, such as Neo4j. Modeled after existing JDBC-based MessageSource implementations [4, 5], the CypherMessageSource offers all of the advantages of database-backed message definition storage for graph-based applications.
+
+== Making Use of the CypherMessageSource ==
+At a high level, the steps required to make use of the CypherMessageSource fall into:
+Clone the source, build, and include the jar within your project
+Register an instance of the CypherMessageSource within the ApplicationContext
+Create the desired message definitions within the database
+Localize and internationalize the application by updating hard coded strings of text
+
+
+== Clone, Build, Include ==
+When executed from within a unix shell, the following commands will clone the project source and build the jar:
+
+git clone https://github.com/espiegelberg/cypher-messagesource
+cd cypher-messagesource
+mvn clean install
+
+Next make use of your dependency management system, such as Maven or Gradle, to add the jar to the application.
+
+== Registering an Instance ==
+Modify the application to register an instance of the CypherMessageSource, such as through the use of the following JavaConfig:
+
+== Create The Desired Message Definitions ==
+At the graph database level, each message definition is stored within a single MessageDefinition node. By taking advantage of the graph’s ability to store arbitrary key-value pairs, each MessageDefinition node contains a “code” property, indicating which message definition is being defined, and any number of locale code and locale specific message translation pairs. For example, to create a message definition to present users with an internationalized and localized welcome message, the following Cypher would be used:
+
+create (n:MessageDefinition {code: 'welcome', en_US: 'Welcome', fr_FR: 'Bonjour', es_MX: 'Hola'})
+
+The above Cypher statement can be adjusted and reused to formulate each desired message definition within the system. When the time arrives for your application to support a new language or locale, simply add an additional property to each MessageDefinition node containing the desired language code and message text. For example, to present users who have selected an Italian local with an appropriate welcome message, use the following Cypher to update the ‘welcome’ MessageDefinition:
+
+match (n:MessageDefinition) where n.code = 'welcome' set n.it_IT = 'Ciao'
+
+This process of message definition creation should be repeated for all desired localized and internationalized text within your system.
+
+== Localize and Internationalize The Application ==
+Lastly, modify your application to remove instances of hard coded strings of text that should be internationalized and localized. For example, in a JSP-based application, replace the use of “Hello” with the use of Spring’s message tag library [6]:
+
+...
+<spring:message code="welcome" />
+…
+
+As opposed to the previously hard coded value of “Hello”, the above line makes use of Spring’s internationalization and localization infrastructure, which employs the registered CypherMessageSource, to present the current user with the message definition appropriate for their selected language and locale. The result is that users in the US will be presented with “Hello”, users in France with “Bonjour”, and users in Mexico with “Hola”.
+
+Within the service layer, hard coded strings of text can be replaced by the use of an injected MessageSource and by supplying the desired message definition code and any desired locale. For example:
+
+This dynamically generated string value can now be used within the service code just as the preceding hard coded name value was.
+
+== Conclusion ==
+Your software has the a global market. By making use of internationalization and localization, two processes that allow your software to be easily adjusted for different languages and locales, you maximize the number of organizations and people that can make use of it. While Spring provides the core infrastructure, the CypherMessageSource uses the Cypher query language to load message definitions from a Cypher-compatible graph database, such as Neo4j. Providing multiple advantages over the use of properties files, the CypherMessageSource follows a long line of JDBC backed MessageSource implementations and allows you to conveniently and quickly internationalize and localize your graph-based application. 
+
+== Biography ==
+Eric Spiegelberg is the founder of Mile 24, a Twin Cities based software consultancy in the US. As an architect with over 15 years of experience with the Java platform, Eric holds a BS in Computer Science and a MS in Software Engineering, is an avid technologist, a published technical author, and life long learner. Outside of technology Eric is a high performance and instrument rated private pilot, has run the Paris Marathon in France, and enjoys an interest in travel.
