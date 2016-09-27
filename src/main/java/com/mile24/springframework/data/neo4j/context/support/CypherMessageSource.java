@@ -166,12 +166,3 @@ public class CypherMessageSource extends AbstractMessageSource {
     }
 
 }
-
-
-/*
-	@Bean
-   	public MessageSource messageSource() {
-		MessageSource cypherMessageSource = new CypherMessageSource();
-        return cypherMessageSource;
-	}
-*/
