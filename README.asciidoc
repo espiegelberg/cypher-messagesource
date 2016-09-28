@@ -31,7 +31,15 @@ cd cypher-messagesource
 mvn clean install
 ```
 
-Next make use of your dependency management system, such as https://spring.io/guides/gs/maven[Maven] or https://spring.io/guides/gs/gradle[Gradle], to add the jar to the application.
+Next make use of your dependency management system, such as https://spring.io/guides/gs/maven[Maven] or https://spring.io/guides/gs/gradle[Gradle], to add the jar to the application. The following example includes your locally generated jar in your project:
+
+```
+        <dependency>
+            <groupId>com.mile24.</groupId>
+            <artifactId>cypher-messagesource</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+```
 
 == Registering an Instance ==
 Modify the application to register an instance of the CypherMessageSource, such as through the use of the following JavaConfig:
