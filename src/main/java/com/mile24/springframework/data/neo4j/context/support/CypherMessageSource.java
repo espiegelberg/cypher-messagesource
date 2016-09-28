@@ -71,7 +71,7 @@ public class CypherMessageSource extends AbstractMessageSource {
 
     private boolean initialized;
 
-    private String queryCypher = "match (n:MessageDefinition) return n.code as code, n.en_US as en_US, n.en_GB as en_GB";
+    private String queryCypher = "match (n:MessageDefinition) return n.code as code, n.en_US as en_US, n.fr_FR as fr_FR, n.es_MX as es_MX";
 
     private Map<String, Map<Locale, String>> messages = new HashMap<String, Map<Locale, String>>();
 
