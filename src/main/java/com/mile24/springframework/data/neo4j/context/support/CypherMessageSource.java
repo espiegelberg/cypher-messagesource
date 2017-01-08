@@ -140,10 +140,15 @@ public class CypherMessageSource extends AbstractMessageSource {
 
         initialize();
 
+        MessageFormat result = null;
+        
         Map<Locale, String> localeToTextMap = messages.get(code);
-        String text = localeToTextMap.get(locale);
-
-        return createMessageFormat(text, locale);
+        if (localeToTextMap != null) {
+        	String text = localeToTextMap.get(locale);
+        	result = createMessageFormat(text, locale);
+        }
+        
+        return result; 
 
     }
 
